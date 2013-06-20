@@ -14,6 +14,8 @@ namespace ZeroMQ.Services
 
         public object Decode(byte[] buffer)
         {
+            if (buffer == null || buffer.Length == 0)
+                return null;
             using (var s = new MemoryStream(buffer))
                 return ProtoBuf.Serializer.NonGeneric.Deserialize(_typeResolver(buffer), s);
         }

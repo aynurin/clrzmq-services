@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Text;
 using System.Threading;
 
 namespace ZeroMQ.Services
@@ -32,35 +33,45 @@ namespace ZeroMQ.Services
             _hostingThread.Start();
         }
 
-        public void BindService()
+        private void BindService()
         {
             // ZMQ Context, server socket
             using (var context = ZmqContext.Create())
             using (var server = context.CreateSocket(SocketType.REP))
             {
-                server.Bind(EndpointString());
+                server.Bind(_endPoint.AsString());
 
-                _service.IsRunning = true;
                 try
                 {
                     SetRunning(server);
-                    _service.Starting(server);
 
                     while (true)
                     {
                         // Wait for next request from client
-                        var frm = server.ReceiveFrame();
-                        object msg = MessageFormatter == null ? frm.Buffer : MessageFormatter.Decode(frm.Buffer);
-                        var result = _service.Receive(msg);
-                        if (result != null)
+                        int messageSize;
+                        byte[] buffer = server.Receive(null, TimeSpan.FromSeconds(10), out messageSize);
+                        if (server.ReceiveStatus == ReceiveStatus.TryAgain)
+                            continue;
+                        if (buffer == null || messageSize == 0)
                         {
-                            byte[] data = MessageFormatter == null
-                                              ? (result as byte[])
-                                              : MessageFormatter.Encode(result);
-                            if (data != null)
+                            Thread.Yield();
+                            continue;
+                        }
+
+                        if (server.ReceiveStatus == ReceiveStatus.Received)
+                        {
+                            object msg = _service.MessageFormatter == null ? buffer : _service.MessageFormatter.Decode(buffer);
+
+                            var result = _service.Receive(msg);
+                            if (result != null)
                             {
+                                byte[] data = _service.MessageFormatter == null
+                                                  ? (result as byte[])
+                                                  : _service.MessageFormatter.Encode(result);
+
                                 // Send reply back to client
-                                server.SendFrame(new Frame(data));
+                                if (data != null)
+                                    server.Send(data);
                             }
                         }
                     }
@@ -84,12 +95,6 @@ namespace ZeroMQ.Services
             else if (_serviceFactory != null)
                 foreach (var service in _serviceFactory)
                     SetRunning(socket, service);
-        }
-
-        private string EndpointString()
-        {
-            string ip = _endPoint.Address == IPAddress.Any ? "*" : _endPoint.Address.ToString();
-            return "tcp://" + ip + ":" + _endPoint.Port;
         }
 
         public void Dispose()
