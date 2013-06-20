@@ -3,6 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroMQ.Services", "ZeroMQ.Services\ZeroMQ.Services.csproj", "{90C86950-8436-4ABB-A008-29F132D35E42}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{B506DA78-7D61-4A88-AEB5-98D3D436E711}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\clrzmq.services.0.1.0-rc1.nuspec = nuget\clrzmq.services.0.1.0-rc1.nuspec
+		nuget\LICENSE = nuget\LICENSE
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

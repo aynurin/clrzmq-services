@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+    <metadata>
+        <id>clrzmq.services</id>
+        <version>0.1.0-rc1</version>
+        <authors>saynurin</authors>
+        <owners>Shavkat Aynurin</owners>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>An extension to clrzmq that allows a more .NETish usage of ZeroMQ</description>
+        <tags>zeromq libzmq zmq 0mq</tags>
+        <dependencies>
+            <dependency id="clrzmq" version="3.0.0-rc1" />
+            <dependency id="protobuf-net" version="2.0.0.640" />
+        </dependencies>
+    </metadata>
+  <files>
+    <file src="..\publish\ZeroMQ.Services.dll" target="lib\net40" />
+    <file src="LICENSE"/>
+  </files>
+</package>
